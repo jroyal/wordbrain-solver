@@ -105,44 +105,16 @@ func recursiveWalk(g *Grid, length int, x int, y int, current []string, walkedPa
 		return
 	}
 
-	if g.validMove(x, y+1, walkedPath) {
-		recursiveWalk(g, length, x, y+1, current, walkedPath)
-		walkedPath[y+1][x] = false
-	}
-
-	if g.validMove(x+1, y, walkedPath) {
-		recursiveWalk(g, length, x+1, y, current, walkedPath)
-		walkedPath[y][x+1] = false
-	}
-
-	if g.validMove(x, y-1, walkedPath) {
-		recursiveWalk(g, length, x, y-1, current, walkedPath)
-		walkedPath[y-1][x] = false
-	}
-
-	if g.validMove(x-1, y, walkedPath) {
-		recursiveWalk(g, length, x-1, y, current, walkedPath)
-		walkedPath[y][x-1] = false
-	}
-
-	if g.validMove(x+1, y+1, walkedPath) {
-		recursiveWalk(g, length, x+1, y+1, current, walkedPath)
-		walkedPath[y+1][x+1] = false
-	}
-
-	if g.validMove(x-1, y-1, walkedPath) {
-		recursiveWalk(g, length, x-1, y-1, current, walkedPath)
-		walkedPath[y-1][x-1] = false
-	}
-
-	if g.validMove(x-1, y+1, walkedPath) {
-		recursiveWalk(g, length, x-1, y+1, current, walkedPath)
-		walkedPath[y+1][x-1] = false
-	}
-
-	if g.validMove(x+1, y-1, walkedPath) {
-		recursiveWalk(g, length, x+1, y-1, current, walkedPath)
-		walkedPath[y-1][x+1] = false
+	for i := -1; i <= 1; i++ {
+		for j := -1; j <= 1; j++ {
+			if i == 0 && j == 0 {
+				continue
+			}
+			if g.validMove(x+i, y+j, walkedPath) {
+				recursiveWalk(g, length, x+i, y+j, current, walkedPath)
+				walkedPath[y+j][x+i] = false
+			}
+		}
 	}
 	return
 }

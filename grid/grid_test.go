@@ -1,19 +1,26 @@
 package grid
 
-import (
-	"reflect"
-	"testing"
-)
+import "testing"
 
 func TestGetAllPossibleWordsGrid3Word4(t *testing.T) {
 	g := NewGrid()
 	g.AddRow([]string{"L", "S", "E"})
 	g.AddRow([]string{"L", "I", "D"})
 	g.AddRow([]string{"L", "O", "D"})
-	expected := []string{"LIDS", "LIED", "LIES", "LOIS", "LODE", "LOLL", "SIDE", "SILL", "SILO", "SLID",
-		"IDES", "IDOL", "ILLS", "ODDS", "ODIS", "OISE", "OILS", "ODES", "DILL", "DIDO", "DIES", "DOLL", "DIED"}
+	expectedLength := 23
 	result := g.GetAllPossibleWords(4)
-	if !reflect.DeepEqual(expected, result) {
+	if len(result) != expectedLength {
+		t.Logf("Expected: %d Result:%d", expectedLength, len(result))
+		t.Fail()
+	}
+	found := false
+	for _, answer := range result {
+		if answer == "DOLL" {
+			found = true
+		}
+	}
+	if !found {
+		t.Logf("DOLL should be in result slice %v", result)
 		t.Fail()
 	}
 }
@@ -23,9 +30,20 @@ func TestGetAllPossibleWordsGrid3Word5(t *testing.T) {
 	g.AddRow([]string{"L", "S", "E"})
 	g.AddRow([]string{"L", "I", "D"})
 	g.AddRow([]string{"L", "O", "D"})
-	expected := []string{"LODES", "LOLLS", "SLIDE", "IDOLS", "OLLIE", "DILLS", "DOLLS", "DIODE"}
+	expectedLength := 8
 	result := g.GetAllPossibleWords(5)
-	if !reflect.DeepEqual(expected, result) {
+	if len(result) != expectedLength {
+		t.Logf("Expected: %d Result:%d", expectedLength, len(result))
+		t.Fail()
+	}
+	found := false
+	for _, answer := range result {
+		if answer == "SLIDE" {
+			found = true
+		}
+	}
+	if !found {
+		t.Logf("DOLL should be in result slice %v", result)
 		t.Fail()
 	}
 }
