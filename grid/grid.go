@@ -2,28 +2,33 @@ package grid
 
 import (
 	"bufio"
+	"fmt"
 	"log"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
+
+	"github.com/armon/go-radix"
 )
 
 type Grid struct {
 	grid    [][]string
 	size    int
 	results []string
-	dict    map[string]bool
+	dict    map[string]interface{}
+	radix   *radix.Tree
 }
 
 func NewGrid() *Grid {
 	g := new(Grid)
-	g.dict = loadDict()
+	g.loadDict()
 	return g
 }
 
-func loadDict() map[string]bool {
-	dict := map[string]bool{}
+func (g *Grid) loadDict() {
+	var dict = make(map[string]interface{})
+
 	pwd, _ := os.Getwd()
 	pwd = pwd[:strings.LastIndex(pwd, "wordbrain-solver")+len("wordbrain-solver")]
 	absPath, _ := filepath.Abs(path.Join(pwd, "data/dictionary.txt"))
@@ -35,14 +40,22 @@ func loadDict() map[string]bool {
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		dict[strings.ToUpper(scanner.Text())] = true
+		word := strings.ToUpper(scanner.Text())
+		dict[word] = true
 	}
 
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
 
-	return dict
+	g.dict = dict
+	g.radix = radix.NewFromMap(dict)
+
+	g.radix.WalkPrefix("WIT", func(k string, v interface{}) bool {
+		fmt.Printf("%s %v\n", k, v)
+		return true
+	})
+
 }
 
 func (g *Grid) AddRow(r []string) {
@@ -96,9 +109,14 @@ func existingResult(list []string, s string) bool {
 func recursiveWalk(g *Grid, length int, x int, y int, current []string, walkedPath [][]bool) {
 	// fmt.Printf("x:%d y:%d current: %v walkedPath: %v\n", x, y, current, walkedPath)
 	current = append(current, g.grid[y][x])
+	currentString := strings.Join(current, "")
+	if _, ok := g.radix.Get(currentString); !ok {
+		return
+	}
 	walkedPath[y][x] = true
 	if len(current) == length {
-		currentString := strings.Join(current, "")
+
+		fmt.Println(g.radix.LongestPrefix(currentString))
 		if _, ok := g.dict[currentString]; ok && !existingResult(g.results, currentString) {
 			g.results = append(g.results, currentString)
 		}
