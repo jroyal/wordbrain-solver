@@ -10,19 +10,20 @@ import (
 )
 
 type Grid struct {
-	grid    [][]string
-	size    int
+	Grid    [][]string `json:"grid"`
+	Size    int        `json:"grid_size"`
+	Words   []int      `json:"word_sizes"`
 	results []string
 	dict    map[string]bool
 }
 
 func NewGrid() *Grid {
 	g := new(Grid)
-	g.dict = loadDict()
+	g.LoadDict()
 	return g
 }
 
-func loadDict() map[string]bool {
+func (g *Grid) LoadDict() {
 	dict := map[string]bool{}
 	pwd, _ := os.Getwd()
 	pwd = pwd[:strings.LastIndex(pwd, "wordbrain-solver")+len("wordbrain-solver")]
@@ -42,12 +43,12 @@ func loadDict() map[string]bool {
 		log.Fatal(err)
 	}
 
-	return dict
+	g.dict = dict
 }
 
 func (g *Grid) AddRow(r []string) {
-	g.grid = append(g.grid, r)
-	g.size = len(r)
+	g.Grid = append(g.Grid, r)
+	g.Size = len(r)
 }
 
 func generateCleanWalkPath(size int) [][]bool {
@@ -62,18 +63,19 @@ func generateCleanWalkPath(size int) [][]bool {
 }
 
 func (g *Grid) GetAllPossibleWords(length int) []string {
+	log.Printf("Getting all words sized %d", length)
 	var current []string
 
-	for i := 0; i < g.size; i++ {
-		for j := 0; j < g.size; j++ {
-			recursiveWalk(g, length, i, j, current, generateCleanWalkPath(g.size))
+	for i := 0; i < g.Size; i++ {
+		for j := 0; j < g.Size; j++ {
+			recursiveWalk(g, length, i, j, current, generateCleanWalkPath(g.Size))
 		}
 	}
 	return g.results
 }
 
 func (g *Grid) validMove(x int, y int, walkedPath [][]bool) bool {
-	if x >= g.size || y >= g.size || x < 0 || y < 0 {
+	if x >= g.Size || y >= g.Size || x < 0 || y < 0 {
 		return false
 	}
 
@@ -95,7 +97,7 @@ func existingResult(list []string, s string) bool {
 
 func recursiveWalk(g *Grid, length int, x int, y int, current []string, walkedPath [][]bool) {
 	// fmt.Printf("x:%d y:%d current: %v walkedPath: %v\n", x, y, current, walkedPath)
-	current = append(current, g.grid[y][x])
+	current = append(current, g.Grid[y][x])
 	walkedPath[y][x] = true
 	if len(current) == length {
 		currentString := strings.Join(current, "")

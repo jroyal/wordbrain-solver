@@ -1,14 +1,30 @@
 package main
 
-import "fmt"
-import "github.com/jroyal/wordbrain-solver/grid"
+import (
+	"encoding/json"
+	"log"
+	"net/http"
+
+	"github.com/gorilla/mux"
+	"github.com/jroyal/wordbrain-solver/grid"
+)
+
+func SolveEndpoint(w http.ResponseWriter, req *http.Request) {
+	params := mux.Vars(req)
+	var myGrid grid.Grid
+	log.Printf("Request Received %v", params)
+	_ = json.NewDecoder(req.Body).Decode(&myGrid)
+	myGrid.LoadDict()
+	log.Printf("%v", myGrid)
+	results := map[int][]string{}
+	for _, elem := range myGrid.Words {
+		results[elem] = myGrid.GetAllPossibleWords(elem)
+	}
+	json.NewEncoder(w).Encode(results)
+}
 
 func main() {
-	fmt.Printf("Hello, world.\n")
-	g := grid.NewGrid()
-	g.AddRow([]string{"T", "E", "L", "H"})
-	g.AddRow([]string{"R", "T", "C", "T"})
-	g.AddRow([]string{"A", "I", "C", "I"})
-	g.AddRow([]string{"H", "Y", "C", "W"})
-	fmt.Println(g.GetAllPossibleWords(5))
+	router := mux.NewRouter()
+	router.HandleFunc("/solve", SolveEndpoint).Methods("POST")
+	log.Fatal(http.ListenAndServe("localhost:8080", router))
 }
