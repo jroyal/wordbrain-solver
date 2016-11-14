@@ -1,12 +1,10 @@
 package grid
 
 import (
-	"bufio"
 	"log"
-	"os"
-	"path"
-	"path/filepath"
 	"strings"
+
+	"github.com/jroyal/wordbrain-solver/dictionary"
 )
 
 type Grid struct {
@@ -14,36 +12,12 @@ type Grid struct {
 	Size    int        `json:"grid_size"`
 	Words   []int      `json:"word_sizes"`
 	results []string
-	dict    map[string]bool
 }
 
 func NewGrid() *Grid {
 	g := new(Grid)
-	g.LoadDict()
+	dictionary.LoadDict()
 	return g
-}
-
-func (g *Grid) LoadDict() {
-	dict := map[string]bool{}
-	pwd, _ := os.Getwd()
-	pwd = pwd[:strings.LastIndex(pwd, "wordbrain-solver")+len("wordbrain-solver")]
-	absPath, _ := filepath.Abs(path.Join(pwd, "data/dictionary.txt"))
-	file, err := os.Open(absPath)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		dict[strings.ToUpper(scanner.Text())] = true
-	}
-
-	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
-	}
-
-	g.dict = dict
 }
 
 func (g *Grid) AddRow(r []string) {
@@ -101,7 +75,7 @@ func recursiveWalk(g *Grid, length int, x int, y int, current []string, walkedPa
 	walkedPath[y][x] = true
 	if len(current) == length {
 		currentString := strings.Join(current, "")
-		if _, ok := g.dict[currentString]; ok && !existingResult(g.results, currentString) {
+		if dictionary.CheckWord(currentString) && !existingResult(g.results, currentString) {
 			g.results = append(g.results, currentString)
 		}
 		return

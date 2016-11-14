@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/jroyal/wordbrain-solver/dictionary"
 	"github.com/jroyal/wordbrain-solver/grid"
 )
 
@@ -14,8 +15,6 @@ func SolveEndpoint(w http.ResponseWriter, req *http.Request) {
 	var myGrid grid.Grid
 	log.Printf("Request Received %v", params)
 	_ = json.NewDecoder(req.Body).Decode(&myGrid)
-	myGrid.LoadDict()
-	log.Printf("%v", myGrid)
 	results := map[int][]string{}
 	for _, elem := range myGrid.Words {
 		results[elem] = myGrid.GetAllPossibleWords(elem)
@@ -25,6 +24,7 @@ func SolveEndpoint(w http.ResponseWriter, req *http.Request) {
 
 func main() {
 	router := mux.NewRouter()
+	dictionary.LoadDict()
 	router.HandleFunc("/solve", SolveEndpoint).Methods("POST")
 	log.Fatal(http.ListenAndServe("localhost:8080", router))
 }
