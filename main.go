@@ -11,10 +11,9 @@ import (
 )
 
 func SolveEndpoint(w http.ResponseWriter, req *http.Request) {
-	params := mux.Vars(req)
 	var myGrid grid.Grid
-	log.Printf("Request Received %v", params)
 	_ = json.NewDecoder(req.Body).Decode(&myGrid)
+	log.Printf("Request Received %v", myGrid)
 	results := map[int][]string{}
 	for _, elem := range myGrid.Words {
 		results[elem] = myGrid.GetAllPossibleWords(elem)
