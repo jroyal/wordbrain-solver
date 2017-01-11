@@ -1,7 +1,6 @@
 package grid
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/jroyal/wordbrain-solver/dictionary"
@@ -28,16 +27,18 @@ func (g *Grid) AddRow(r []string) {
 	g.Size = len(r)
 }
 
-// GetAllPossibleWords of a given length for the current grid
-func (g *Grid) GetAllPossibleWords(length int) []string {
-	fmt.Printf("Getting all words sized %d\n", length)
+// Solve of a given length for the current grid
+func (g *Grid) Solve(lengths []int) []string {
 	var current []string
 
-	for i := 0; i < g.Size; i++ {
-		for j := 0; j < g.Size; j++ {
-			recursiveWalk(g, length, i, j, current, generateCleanWalkPath(g.Size))
+	for _, length := range lengths {
+		for i := 0; i < g.Size; i++ {
+			for j := 0; j < g.Size; j++ {
+				recursiveWalk(g, length, i, j, current, generateCleanWalkPath(g.Size))
+			}
 		}
 	}
+
 	return g.results
 }
 

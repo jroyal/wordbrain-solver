@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/jroyal/wordbrain-solver/grid"
@@ -13,7 +14,7 @@ import (
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 	var gridSize int
-	var wordSize int
+	var wordSizes []int
 	var myGrid = grid.NewGrid()
 
 	fmt.Print("Grid size: ")
@@ -28,11 +29,12 @@ func main() {
 		myGrid.AddRow(strings.Fields(gridLine))
 	}
 
-	fmt.Print("Size of word to solve for: ")
+	fmt.Print("Space separated lengths to solve for: ")
 
-	if _, err := fmt.Scan(&wordSize); err != nil {
-		log.Print("  Word size input failed, due to ", err)
-		return
+	wordSizeStr, _ := reader.ReadString('\n')
+	for _, size := range strings.Fields(wordSizeStr) {
+		i, _ := strconv.Atoi(size)
+		wordSizes = append(wordSizes, i)
 	}
-	fmt.Print(myGrid.GetAllPossibleWords(wordSize))
+	fmt.Print(myGrid.Solve(wordSizes))
 }
