@@ -1,29 +1,38 @@
 package main
 
 import (
-	"encoding/json"
+	"bufio"
+	"fmt"
 	"log"
-	"net/http"
+	"os"
+	"strings"
 
-	"github.com/gorilla/mux"
-	"github.com/jroyal/wordbrain-solver/dictionary"
 	"github.com/jroyal/wordbrain-solver/grid"
 )
 
-func SolveEndpoint(w http.ResponseWriter, req *http.Request) {
-	var myGrid grid.Grid
-	_ = json.NewDecoder(req.Body).Decode(&myGrid)
-	log.Printf("Request Received %v", myGrid)
-	results := map[int][]string{}
-	for _, elem := range myGrid.Words {
-		results[elem] = myGrid.GetAllPossibleWords(elem)
-	}
-	json.NewEncoder(w).Encode(results)
-}
-
 func main() {
-	router := mux.NewRouter()
-	dictionary.LoadDict()
-	router.HandleFunc("/solve", SolveEndpoint).Methods("POST")
-	log.Fatal(http.ListenAndServe("localhost:8080", router))
+	reader := bufio.NewReader(os.Stdin)
+	var gridSize int
+	var wordSize int
+	var myGrid = grid.NewGrid()
+
+	fmt.Print("Grid size: ")
+	if _, err := fmt.Scan(&gridSize); err != nil {
+		log.Print("  Grid Size input failed, due to ", err)
+		return
+	}
+
+	for index := 0; index < gridSize; index++ {
+		fmt.Printf("Grid row %d: ", index)
+		gridLine, _ := reader.ReadString('\n')
+		myGrid.AddRow(strings.Fields(gridLine))
+	}
+
+	fmt.Print("Size of word to solve for: ")
+
+	if _, err := fmt.Scan(&wordSize); err != nil {
+		log.Print("  Word size input failed, due to ", err)
+		return
+	}
+	fmt.Print(myGrid.GetAllPossibleWords(wordSize))
 }

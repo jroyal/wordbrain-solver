@@ -1,16 +1,16 @@
 package grid
 
 import (
-	"log"
+	"fmt"
 	"strings"
 
 	"github.com/jroyal/wordbrain-solver/dictionary"
 )
 
 type Grid struct {
-	Grid    [][]string `json:"grid"`
-	Size    int        `json:"grid_size"`
-	Words   []int      `json:"word_sizes"`
+	Grid    [][]string
+	Size    int
+	Words   []int
 	results []string
 }
 
@@ -37,7 +37,7 @@ func generateCleanWalkPath(size int) [][]bool {
 }
 
 func (g *Grid) GetAllPossibleWords(length int) []string {
-	log.Printf("Getting all words sized %d", length)
+	fmt.Printf("Getting all words sized %d\n", length)
 	var current []string
 
 	for i := 0; i < g.Size; i++ {
